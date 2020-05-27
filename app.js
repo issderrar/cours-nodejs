@@ -1,8 +1,14 @@
 const express = require('express')
 const app = express()
 const port = 8080
-let data = require('./datas/data.json')
-let players = require('./datas/tennisplayers.json')
+const morgan = require("morgan")
+const bodyParser = require("body-parser")
+const data = require('./datas/data.json')
+const players = require('./datas/tennisplayers.json')
+
+app.use(morgan('tiny'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
     res.send('Hello World!')
@@ -32,7 +38,7 @@ app.get('/students/:lastName', function (req, res) {
 })
 
 app.get('/players', function (req, res) {
-    res.send(players)
+    res.send(players.players)
 })
 app.get('/players/find/:lastName', function (req, res) {
     const {lastName} = req.params
@@ -48,7 +54,7 @@ app.get('/players/find/:lastName', function (req, res) {
 app.get('/players/:id', function (req, res) {
     const {id} = req.params
     let result = players.players.find(
-        (player) => player.id === Number(id)
+        (player) => player.id === id
     )
     if (result) {
         res.send(result)
@@ -56,6 +62,10 @@ app.get('/players/:id', function (req, res) {
         res.sendStatus(404)
     }
 })
+
+app.post('/players', (req, res) => {
+    res.send(req.body);
+});
 
 app.listen(8080, function () {
     console.log('Example app listening on port: ${port}')
